@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run dev:*)",
+      "Bash(npm run:*)",
+      "Bash(curl:*)",
+      "Bash(pkill:*)",
+      "Bash(node server.js)",
+      "Bash(node:*)",
+      "Bash(kill:*)",
+      "Bash(mkdir:*)",
+      "Bash(npm create:*)",
+      "Bash(npm install)",
+      "Bash(npm install:*)",
+      "Bash(chmod:*)",
+      "Bash(mv:*)",
+      "Bash(touch:*)",
+      "Bash(./deploy.sh deploy:*)",
+      "Bash(vercel:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git remote add:*)",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(ls:*)",
+      "Bash(npm init:*)",
+      "Bash(npm start)",
+      "WebFetch(domain:shopscanner-frontend-ej0brmmwe-shop-scanner.vercel.app)"
+    ],
+    "deny": []
+  }
+}

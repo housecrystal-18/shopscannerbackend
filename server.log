@@ -1,0 +1,38 @@
+
+> shopscanner-backend@1.0.0 start
+> node server.js
+
+[dotenv@17.2.1] injecting env (12) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+🚀 Shop Scanner API Server Started
+📡 Server running on port 3001
+📋 Available endpoints:
+   GET  /health
+   POST /api/auth/register
+   POST /api/auth/login
+   GET  /api/auth/test
+   GET  /api/database/test
+   GET  /api/products
+   POST /api/products
+   GET  /api/products/:id
+   PUT  /api/products/:id
+   DELETE /api/products/:id
+========================
+✅ Connected to MongoDB
+(node:60681) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
+(Use `node --trace-warnings ...` to show where the warning was created)
+[2025-07-30T11:35:07.553Z] POST /api/auth/register - IP: ::1
+[2025-07-30T11:35:07.948Z] POST /api/auth/register - 201 - 395ms
+[2025-07-30T11:35:36.527Z] POST /api/auth/login - IP: ::1
+[2025-07-30T11:35:36.915Z] POST /api/auth/login - 200 - 388ms
+[2025-07-30T11:35:42.460Z] GET /api/products - IP: ::1
+[2025-07-30T11:35:42.598Z] GET / - 200 - 138ms
+[2025-07-30T11:36:01.256Z] GET /api/barcode/lookup/123456789012 - IP: ::1
+[2025-07-30T11:36:01.269Z] GET /lookup/123456789012 - 401 - 13ms
+[2025-07-30T11:36:06.828Z] POST /api/auth/login - IP: ::1
+[2025-07-30T11:36:07.306Z] POST /api/auth/login - 200 - 478ms
+[2025-07-30T11:36:15.556Z] GET /api/barcode/lookup/123456789012 - IP: ::1
+[2025-07-30T11:36:15.562Z] GET /lookup/123456789012 - 401 - 6ms
+[2025-07-30T11:36:30.348Z] POST /api/auth/login - IP: ::1
+[2025-07-30T11:36:30.686Z] POST /api/auth/login - 200 - 338ms
+[2025-07-30T11:36:37.193Z] GET /api/wishlist - IP: ::1
+[2025-07-30T11:36:37.263Z] GET / - 200 - 70ms

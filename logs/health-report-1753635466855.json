@@ -1,0 +1,89 @@
+{
+  "timestamp": "2025-07-27T16:57:46.855Z",
+  "overall": "HEALTHY",
+  "summary": {
+    "total": 7,
+    "passed": 7,
+    "failed": 0,
+    "successRate": "100%"
+  },
+  "checks": [
+    {
+      "name": "API Health",
+      "status": "PASS",
+      "duration": "15ms",
+      "details": {
+        "message": "API responding normally",
+        "version": "1.0.0",
+        "timestamp": "2025-07-27T16:57:46.711Z"
+      }
+    },
+    {
+      "name": "Database Connection",
+      "status": "PASS",
+      "duration": "17ms",
+      "details": {
+        "message": "Database connected successfully",
+        "collections": 3,
+        "uri": "mongodb://localhost:27017/shopscanner"
+      }
+    },
+    {
+      "name": "Auth Endpoints",
+      "status": "PASS",
+      "duration": "2ms",
+      "details": {
+        "message": "Auth endpoints responding",
+        "timestamp": "2025-07-27T16:57:46.733Z"
+      }
+    },
+    {
+      "name": "Product Endpoints",
+      "status": "PASS",
+      "duration": "7ms",
+      "details": {
+        "message": "Product endpoints responding",
+        "dataStructure": "Valid"
+      }
+    },
+    {
+      "name": "File Storage",
+      "status": "PASS",
+      "duration": "1ms",
+      "details": {
+        "message": "File storage accessible and writable",
+        "uploadsDir": "/Users/crystalhouse/Documents/shopscanner-backend/uploads",
+        "logsDir": "/Users/crystalhouse/Documents/shopscanner-backend/logs"
+      }
+    },
+    {
+      "name": "Environment Config",
+      "status": "PASS",
+      "duration": "0ms",
+      "details": {
+        "message": "Environment configuration valid",
+        "required": "3/3",
+        "optional": "0/3",
+        "missingOptional": [
+          "GOOGLE_CLOUD_PROJECT_ID",
+          "BARCODE_LOOKUP_API_KEY",
+          "ALLOWED_ORIGINS"
+        ]
+      }
+    },
+    {
+      "name": "External Services",
+      "status": "PASS",
+      "duration": "113ms",
+      "details": {
+        "message": "1/1 external services available",
+        "services": [
+          {
+            "name": "UPC Database API",
+            "status": "Available"
+          }
+        ]
+      }
+    }
+  ]
+}
