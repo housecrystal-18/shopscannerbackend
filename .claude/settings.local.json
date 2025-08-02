@@ -26,7 +26,12 @@
       "Bash(ls:*)",
       "Bash(npm init:*)",
       "Bash(npm start)",
-      "WebFetch(domain:shopscanner-frontend-ej0brmmwe-shop-scanner.vercel.app)"
+      "WebFetch(domain:shopscanner-frontend-ej0brmmwe-shop-scanner.vercel.app)",
+      "Bash(git rm:*)",
+      "Bash(sed:*)",
+      "Bash(grep:*)",
+      "Bash(rm:*)",
+      "Bash(cp:*)"
     ],
     "deny": []
   }

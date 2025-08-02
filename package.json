@@ -40,5 +40,13 @@
     "jest": "^29.7.0",
     "nodemon": "^3.1.10",
     "supertest": "^7.1.4"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/housecrystal-18/shopscannerbackend.git"
+  },
+  "bugs": {
+    "url": "https://github.com/housecrystal-18/shopscannerbackend/issues"
+  },
+  "homepage": "https://github.com/housecrystal-18/shopscannerbackend#readme"
 }

@@ -1,6 +1,6 @@
-# Shop Scanner Backend API
+# Shop Scan Pro Backend
 
-A comprehensive backend service for a shop scanning application that allows users to scan product barcodes, compare prices, and manage product listings.
+REST API backend for Shop Scan Pro - handles authentication, subscription management, and user data persistence.
 
 ## 🚀 Features
 

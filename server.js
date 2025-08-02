@@ -1,257 +1,158 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
+const helmet = require('helmet');
+const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
-// Import security middleware
-const {
-  generalLimiter,
-  authLimiter,
-  uploadLimiter,
-  barcodeLimiter,
-  priceComparisonLimiter,
-  securityMiddleware,
-  additionalSecurity,
-  requestLogger,
-  validateInput
-} = require('./middleware/rateLimiter');
-
 const app = express();
+const PORT = process.env.PORT || 3001;
 
-// Trust proxy for rate limiting behind reverse proxy
-app.set('trust proxy', 1);
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: {
+    success: false,
+    error: {
+      code: 'RATE_LIMIT_EXCEEDED',
+      message: 'Too many requests. Please try again later.',
+      retryAfter: 900
+    }
+  }
+});
 
-// Security middleware
-app.use(securityMiddleware);
-app.use(additionalSecurity);
+// Middleware
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 
-// Request logging
-app.use(requestLogger);
-
-// General rate limiting
-app.use(generalLimiter);
-
-// Input validation and sanitization
-app.use(validateInput);
-
-// Basic middleware
 app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS?.split(',') || '*',
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:3000', 
+    'https://shopscannerpro.com',
+    'https://www.shopscannerpro.com',
+    'https://shopscanner-frontend.vercel.app'
+  ],
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
+app.use(morgan('combined'));
+app.use(limiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Database connection
-mongoose.connect(process.env.MONGODB_URI)
-.then(() => {
-  console.log('✅ Connected to MongoDB');
-})
-.catch((error) => {
-  console.error('❌ MongoDB connection error:', error);
-});
+// Trust proxy for Railway
+app.set('trust proxy', 1);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({
-    status: 'healthy',
-    service: 'Shop Scanner API',
+    status: 'ok',
+    service: 'shopscanner-backend',
     version: '1.0.0',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
   });
-});
-
-// Registration endpoint with rate limiting
-app.post('/api/auth/register', authLimiter, async (req, res) => {
-  try {
-    const User = require('./models/User');
-    const jwt = require('jsonwebtoken');
-    
-    const { name, email, password, type } = req.body;
-
-    // Basic validation
-    if (!name || !email || !password || !type) {
-      return res.status(400).json({
-        success: false,
-        message: 'Name, email, password, and type are required'
-      });
-    }
-
-    // Check if user already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({
-        success: false,
-        message: 'User with this email already exists'
-      });
-    }
-
-    // Create new user
-    const user = new User({
-      name,
-      email,
-      password,
-      type,
-      privacyAgreement: {
-        agreed: true,
-        agreedAt: new Date(),
-        version: '1.0'
-      }
-    });
-
-    await user.save();
-
-    // Generate JWT token
-    const token = jwt.sign(
-      { userId: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
-
-    res.status(201).json({
-      success: true,
-      message: 'User registered successfully',
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        type: user.type
-      }
-    });
-
-  } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Registration failed',
-      error: error.message
-    });
-  }
-});
-
-// Login endpoint with rate limiting
-app.post('/api/auth/login', authLimiter, async (req, res) => {
-  try {
-    const User = require('./models/User');
-    const jwt = require('jsonwebtoken');
-    
-    const { email, password } = req.body;
-
-    // Basic validation
-    if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: 'Email and password are required'
-      });
-    }
-
-    // Find user and include password field
-    const user = await User.findOne({ email }).select('+password');
-    
-    if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid email or password'
-      });
-    }
-
-    // Verify password
-    const isPasswordValid = await user.comparePassword(password);
-    
-    if (!isPasswordValid) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid email or password'
-      });
-    }
-
-    // Generate JWT token
-    const token = jwt.sign(
-      { userId: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
-
-    res.json({
-      success: true,
-      message: 'Login successful',
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        type: user.type,
-        plan: user.plan
-      }
-    });
-
-  } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Login failed',
-      error: error.message
-    });
-  }
 });
 
 // Routes
-const productRoutes = require('./routes/products');
-const uploadRoutes = require('./routes/upload');
-const barcodeRoutes = require('./routes/barcode');
-const priceComparisonRoutes = require('./routes/priceComparison');
-const wishlistRoutes = require('./routes/wishlist');
-app.use('/api/products', productRoutes);
-app.use('/api/upload', uploadLimiter, uploadRoutes);
-app.use('/api/barcode', barcodeLimiter, barcodeRoutes);
-app.use('/api/price-comparison', priceComparisonLimiter, priceComparisonRoutes);
-app.use('/api/wishlist', wishlistRoutes);
+app.use('/auth', require('./src/routes/auth'));
+app.use('/subscription', require('./src/routes/subscription'));
+app.use('/user', require('./src/routes/user'));
 
-// Serve uploaded files statically
-app.use('/uploads', express.static('uploads'));
-
-// Test endpoints (must come before error handlers)
-app.get('/api/auth/test', (req, res) => {
-  res.json({ message: 'Auth service online', timestamp: new Date() });
-});
-
-app.get('/api/database/test', (req, res) => {
-  const dbState = mongoose.connection.readyState;
+// Root endpoint
+app.get('/', (req, res) => {
   res.json({
-    success: dbState === 1,
-    message: dbState === 1 ? 'Database connected' : 'Database not connected',
-    state: dbState
+    message: 'Shop Scan Pro API',
+    version: '1.0.0',
+    status: 'operational',
+    endpoints: {
+      health: '/health',
+      auth: '/auth/*',
+      subscription: '/subscription/*',
+      user: '/user/*'
+    }
   });
 });
 
-// Error handling
-const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
+// 404 handler
+app.use('*', (req, res) => {
+  res.status(404).json({
+    success: false,
+    error: {
+      code: 'NOT_FOUND',
+      message: 'Endpoint not found',
+      path: req.originalUrl
+    }
+  });
+});
 
-// 404 handler for undefined routes
-app.use(notFoundHandler);
+// Error handler
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  
+  // JWT errors
+  if (err.name === 'JsonWebTokenError') {
+    return res.status(401).json({
+      success: false,
+      error: {
+        code: 'INVALID_TOKEN',
+        message: 'Invalid authentication token'
+      }
+    });
+  }
+  
+  if (err.name === 'TokenExpiredError') {
+    return res.status(401).json({
+      success: false,
+      error: {
+        code: 'TOKEN_EXPIRED',
+        message: 'Authentication token has expired'
+      }
+    });
+  }
+  
+  // Validation errors
+  if (err.name === 'ValidationError') {
+    return res.status(400).json({
+      success: false,
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: 'Invalid input data',
+        details: err.details || err.message
+      }
+    });
+  }
+  
+  // Default error
+  res.status(err.status || 500).json({
+    success: false,
+    error: {
+      code: 'INTERNAL_ERROR',
+      message: process.env.NODE_ENV === 'production' 
+        ? 'An unexpected error occurred'
+        : err.message || 'Internal server error'
+    }
+  });
+});
 
-// Global error handler
-app.use(errorHandler);
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully');
+  process.exit(0);
+});
 
-const PORT = process.env.PORT || 3001;
+process.on('SIGINT', () => {
+  console.log('SIGINT received, shutting down gracefully');
+  process.exit(0);
+});
 
-app.listen(PORT, () => {
-  console.log('🚀 Shop Scanner API Server Started');
-  console.log(`📡 Server running on port ${PORT}`);
-  console.log('📋 Available endpoints:');
-  console.log('   GET  /health');
-  console.log('   POST /api/auth/register');
-  console.log('   POST /api/auth/login');
-  console.log('   GET  /api/auth/test');
-  console.log('   GET  /api/database/test');
-  console.log('   GET  /api/products');
-  console.log('   POST /api/products');
-  console.log('   GET  /api/products/:id');
-  console.log('   PUT  /api/products/:id');
-  console.log('   DELETE /api/products/:id');
-  console.log('========================');
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`📍 Health check: http://localhost:${PORT}/health`);
 });
