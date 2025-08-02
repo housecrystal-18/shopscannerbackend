@@ -5,6 +5,8 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
+const { initDatabase } = require('./src/models/database');
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -151,8 +153,15 @@ process.on('SIGINT', () => {
   process.exit(0);
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`📍 Health check: http://localhost:${PORT}/health`);
-});
+// Initialize database before starting server
+const startServer = async () => {
+  await initDatabase();
+  
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`📍 Health check: http://localhost:${PORT}/health`);
+  });
+};
+
+startServer();
