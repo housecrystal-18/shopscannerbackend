@@ -118,8 +118,9 @@ router.post('/register', [
         updatedAt: new Date()
       };
       
-      users.push(user);
-    
+      users.push(user); 
+     } // <-- ADD THIS CLOSING BRACE
+
     // Generate JWT
     const token = generateToken(user.id, user.email);
     
@@ -266,3 +267,4 @@ router.post('/logout', (req, res) => {
 });
 
 module.exports = router;
+Fix missing closing brace in registration endpoint
