@@ -2,7 +2,8 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
-const { User } = require('../models/database');
+// const { User } = require('../models/database');
+const User = null; // Temporarily disabled
 const router = express.Router();
 
 // Fallback to in-memory storage if no database

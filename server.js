@@ -5,7 +5,7 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
-const { initDatabase } = require('./src/models/database');
+// const { initDatabase } = require('./src/models/database');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -155,7 +155,8 @@ process.on('SIGINT', () => {
 
 // Initialize database before starting server
 const startServer = async () => {
-  await initDatabase();
+  // await initDatabase();
+  console.log('📦 Database temporarily disabled - using in-memory storage');
   
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Server running on port ${PORT}`);
