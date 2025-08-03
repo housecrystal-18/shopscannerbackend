@@ -267,4 +267,3 @@ router.post('/logout', (req, res) => {
 });
 
 module.exports = router;
-Fix missing closing brace in registration endpoint
