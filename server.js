@@ -1,40 +1,20 @@
-const express = require('express');
-  const cors = require('cors');
-  require('dotenv').config();
+ Write(/Users/crystalhouse/Documents/shopscanner-frontend/GITHUB_FILES/ser
+       ver.js)
+  ⎿  Wrote 14 lines to /Users/crystalhouse/Documents/shopscanner-frontend/G
+     THUB_FILES/server.js
+     const express = require('express');
+     const { app, startServer } = require('./src/app');
 
-  const app = express();
-  const PORT = process.env.PORT || 3001;
+     // Health check endpoint (redundant but included for clarity)
+     app.get('/health', (req, res) => {
+       res.json({
+         status: 'ok',
+         timestamp: new Date().toISOString(),
+         googleOAuth: process.env.GOOGLE_CLIENT_ID ? 'Configured' : 'Not 
+     configured'
+       });
+     });
 
-  app.use(cors());
-  app.use(express.json());
-
-  app.get('/health', (req, res) => {
-    res.json({
-      status: 'ok',
-      timestamp: new Date().toISOString(),
-      googleOAuth: process.env.GOOGLE_CLIENT_ID ? 'Configured' : 'Not 
-  configured'
-    });
-  });
-
-  app.get('/api/auth/google', (req, res) => {
-    res.json({
-      message: 'Google OAuth endpoint - will be implemented',
-      status: 'placeholder'
-    });
-  });
-
-  app.get('/', (req, res) => {
-    res.json({
-      message: 'Shop Scanner API',
-      version: '1.0.1',
-      status: 'running'
-    });
-  });
-
-  app.listen(PORT, () => {
-    console.log('🚀 Server started on port', PORT);
-    console.log('🔐 Google OAuth:', process.env.GOOGLE_CLIENT_ID ?
-  'Configured' : 'Not configured');
-  });
+     // Start the server
+     startServer();
 
