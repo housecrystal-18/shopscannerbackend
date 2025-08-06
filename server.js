@@ -1,5 +1,4 @@
- 1 -  const { app, startServer } = require('./app');
-         1 +  const express = require('express');
+ +  const express = require('express');
          2 +  const mongoose = require('mongoose');
          3 +  const cors = require('cors');
          4 +  const helmet = require('helmet');
@@ -7,13 +6,16 @@
          6 +  const session = require('express-session');
          7 +  const MongoStore = require('connect-mongo');
          8 +  require('dotenv').config();
-         9    // Start the server
+         9    
+        10 -  // Start the server
         11 -  startServer();
         10   \ No newline at end of file
         11 +  const app = express();
-        12 +  // Trust proxy (important for Railway)
+        12 +  
+        13 +  // Trust proxy (important for Railway)
         14 +  app.set('trust proxy', 1);
-        15 +  // CORS configuration
+        15 +  
+        16 +  // CORS configuration
         17 +  const corsOptions = {
         18 +    origin: function (origin, callback) {
         19 +      const allowedOrigins = 
@@ -21,10 +23,12 @@
         20 +        'http://localhost:3000',
         21 +        'http://localhost:5173',
         22 +        'https://shopscanner-frontend.vercel.app',
-        23 +        'https://shopscanner-frontend-ej0brmmwe-shop-scanner.ver
+        23 +        
+     'https://shopscanner-frontend-ej0brmmwe-shop-scanner.ver
            + cel.app'
         24 +      ];
-        25 +      if (!origin) return callback(null, true);
+        25 +      
+        26 +      if (!origin) return callback(null, true);
         27 +      
         28 +      if (allowedOrigins.includes(origin)) {
         29 +        callback(null, true);
@@ -39,7 +43,8 @@
         37 +    allowedHeaders: ['Content-Type', 'Authorization', 
            + 'X-Requested-With']
         38 +  };
-        39 +  // Middleware
+        39 +  
+        40 +  // Middleware
         41 +  app.use(helmet({
         42 +    crossOriginEmbedderPolicy: false,
         43 +  }));
@@ -47,7 +52,8 @@
         45 +  app.use(express.json({ limit: '10mb' }));
         46 +  app.use(express.urlencoded({ extended: true }));
         47 +  app.use(morgan('combined'));
-        48 +  // Session configuration (before passport)
+        48 +  
+        49 +  // Session configuration (before passport)
         50 +  app.use(session({
         51 +    secret: process.env.SESSION_SECRET || 
            + 'your-super-secret-session-key-change-in-production',
@@ -64,7 +70,8 @@
         61 +      maxAge: 1000 * 60 * 60 * 24
         62 +    }
         63 +  }));
-        64 +  // Initialize Passport (if you have passport config)
+        64 +  
+        65 +  // Initialize Passport (if you have passport config)
         66 +  try {
         67 +    const passport = require('./src/config/passport');
         68 +    app.use(passport.initialize());
@@ -72,7 +79,8 @@
         70 +  } catch (err) {
         71 +    console.log('Passport not configured yet');
         72 +  }
-        73 +  // Health check endpoint
+        73 +  
+        74 +  // Health check endpoint
         75 +  app.get('/health', (req, res) => {
         76 +    res.json({
         77 +      status: 'ok',
@@ -84,7 +92,8 @@
            +  'Not configured'
         82 +    });
         83 +  });
-        84 +  // API status endpoint
+        84 +  
+        85 +  // API status endpoint
         86 +  app.get('/', (req, res) => {
         87 +    res.json({
         88 +      message: 'Shop Scanner API',
@@ -105,7 +114,8 @@
        101 +      }
        102 +    });
        103 +  });
-       104 +  // API Routes
+       104 +  
+       105 +  // API Routes
        106 +  try {
        107 +    app.use('/api/auth', require('./src/routes/auth'));
        108 +  } catch (err) {
@@ -128,7 +138,8 @@
        123 +  }).catch(err => {
        124 +    console.error('MongoDB connection error:', err);
        125 +  });
-       126 +  // 404 handler
+       126 +  
+       127 +  // 404 handler
        128 +  app.use((req, res) => {
        129 +    res.status(404).json({
        130 +      success: false,
@@ -136,7 +147,8 @@
        132 +      path: req.originalUrl
        133 +    });
        134 +  });
-       135 + // Error handler
+       135 +  
+       136 +  // Error handler
        137 +  app.use((err, req, res, next) => {
        138 +    console.error('Error:', err);
        139 +    res.status(err.status || 500).json({
@@ -144,7 +156,8 @@
        141 +      message: err.message || 'Something went wrong'
        142 +    });
        143 +  });
-       144 +  // Start server
+       144 +  
+       145 +  // Start server
        146 +  const PORT = process.env.PORT || 3001;
        147 +  app.listen(PORT, '0.0.0.0', () => {
        148 +    console.log(`Server running on port ${PORT}`);
@@ -154,4 +167,3 @@
            + 'Configured' : 'Not configured'}`);
        151 +  });
        152   \ No newline at end of file
-
