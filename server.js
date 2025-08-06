@@ -61,13 +61,12 @@
     store: MongoStore.create({
       mongoUrl: process.env.MONGODB_URI ||
   'mongodb://localhost:27017/shopscanner',
-      touchAfter: 24 * 3600 // lazy session update
+      touchAfter: 24 * 3600
     }),
     cookie: {
-      secure: process.env.NODE_ENV === 'production', // HTTPS only in 
-  production
+      secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24 // 24 hours
+      maxAge: 1000 * 60 * 60 * 24
     }
   }));
 
